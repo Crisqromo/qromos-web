@@ -162,3 +162,19 @@ button {
   font-size: 12px;
   color: #ccc;
 }
+.card-image-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 14px 0;
+}
+
+.qromo-image {
+  width: 100%;
+  max-width: 130px;
+  border-radius: 10px;
+}
+
+.lock-icon {
+  font-size: 48px;
+}

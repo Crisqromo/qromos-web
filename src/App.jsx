@@ -203,7 +203,17 @@ function App() {
           return (
             <div key={qromo.id} className={`qromo-card ${qromo.rareza} ${obtenido ? 'obtenido' : 'bloqueado'}`}>
               <div className="number">{String(qromo.id).padStart(3, '0')}</div>
-              <div className="shield">{obtenido ? '⚽' : '🔒'}</div>
+              <div className="card-image-box">
+  {obtenido ? (
+    <img
+      className="qromo-image"
+      src={`/qromos/${String(qromo.id).padStart(3, '0')}.png`}
+      alt={qromo.nombre}
+    />
+  ) : (
+    <div className="lock-icon">🔒</div>
+  )}
+</div>
               <h3>{obtenido ? qromo.nombre : 'Bloqueado'}</h3>
               <p>{qromo.rareza}</p>
             </div>
