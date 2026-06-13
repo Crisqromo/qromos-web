@@ -766,7 +766,7 @@ button {
   }
 
   .title-box h1 {
-    font-size: clamp(48px, 16vw, 78px);
+    font-size: clamp(42px, 14vw, 64px);
     line-height: 0.95;
     max-width: 100%;
     overflow-wrap: break-word;
