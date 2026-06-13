@@ -12,6 +12,8 @@ function App() {
   const [filtro, setFiltro] = useState('todos')
   const [codigo, setCodigo] = useState('')
   const [mensajeCanje, setMensajeCanje] = useState('')
+  const [ultimoQromo, setUltimoQromo] = useState(null)
+  const [qromoSeleccionado, setQromoSeleccionado] = useState(null)
 
   useEffect(() => {
     cargarQromos()
@@ -118,14 +120,21 @@ function App() {
     await cargarColeccion(usuario.id)
     setCodigo('')
 
-    const qromoGanado = qromos.find(q => q.id === codeData.qromo_id)
-    setMensajeCanje(`¡Desbloqueaste ${qromoGanado?.nombre || 'un QRomo'}!`)
-  }
+    const qromoGanado = qromos.find(
+  q => q.id === codeData.qromo_id
+)
 
+setUltimoQromo(qromoGanado)
+
+setMensajeCanje(
+  `¡Desbloqueaste ${qromoGanado?.nombre || 'un QRomo'}!`
+)
+}
   const qromosFiltrados =
     filtro === 'todos' ? qromos : qromos.filter((q) => q.rareza === filtro)
 
   const obtenidos = qromos.filter((q) => coleccion.includes(q.id))
+  const porcentaje = Math.round((obtenidos.length / 30) * 100)
 
  if (!usuario) {
   return (
@@ -198,8 +207,20 @@ function App() {
         <button className="logout" onClick={() => setUsuario(null)}>Cerrar sesión</button>
       </header>
 
-      <section className="stats">
-        <div><small>QRomos</small><strong>{obtenidos.length} / 30</strong></div>
+        <section className="stats">
+  <div className="stat-card">
+    <small>QRomos</small>
+    <strong>{obtenidos.length} / 30</strong>
+
+    <div className="album-progress-bar">
+  <div
+    className="album-progress-fill"
+    style={{ width: `${porcentaje}%` }}
+  ></div>
+</div>
+
+    <span className="progress-text">{porcentaje}% completado</span>
+  </div>
         <div><small>Comunes</small><strong>{obtenidos.filter(q => q.rareza === 'comun').length} / 20</strong></div>
         <div><small>Raras</small><strong>{obtenidos.filter(q => q.rareza === 'rara').length} / 7</strong></div>
         <div><small>Legendarias</small><strong>{obtenidos.filter(q => q.rareza === 'legendaria').length} / 3</strong></div>
@@ -216,7 +237,37 @@ function App() {
         <button onClick={canjearCodigo} style={{ marginLeft: 8 }}>
           Canjear
         </button>
-        <p>{mensajeCanje}</p>
+        {!ultimoQromo && <p>{mensajeCanje}</p>}
+        {ultimoQromo && (
+  <div className={`reward-card reward-${ultimoQromo.rareza}`}>
+    <div className="reward-title">
+      {
+  ultimoQromo.rareza === 'legendaria'
+    ? '👑 ¡QROMO LEGENDARIO!'
+    : ultimoQromo.rareza === 'rara'
+    ? '💎 QROMO RARO'
+    : '🎉 NUEVO QROMO'
+}
+    </div>
+    <div className="reward-image-wrapper">
+  <img
+    className="reward-image"
+    src={`/qromos/${String(ultimoQromo.id).padStart(3, '0')}.png`}
+    alt={ultimoQromo.nombre}
+  />
+</div>
+
+    <h3>{ultimoQromo.nombre}</h3>
+
+    <p className="reward-rareza">
+      {ultimoQromo.rareza.toUpperCase()}
+    </p>
+
+    <span>
+      +1 agregado a tu colección
+    </span>
+  </div>
+)}
       </section>
 
       <div className="filters">
@@ -231,7 +282,11 @@ function App() {
           const obtenido = coleccion.includes(qromo.id)
 
           return (
-            <div key={qromo.id} className={`qromo-card ${qromo.rareza} ${obtenido ? 'obtenido' : 'bloqueado'}`}>
+            <div
+  key={qromo.id}
+  className={`qromo-card ${qromo.rareza} ${obtenido ? 'obtenido' : 'bloqueado'}`}
+  onClick={() => obtenido && setQromoSeleccionado(qromo)}
+>
               <div className="number">{String(qromo.id).padStart(3, '0')}</div>
               <div className="card-image-box">
   {obtenido ? (
@@ -241,15 +296,41 @@ function App() {
       alt={qromo.nombre}
     />
   ) : (
-    <div className="lock-icon">🔒</div>
+    <div className="mystery-card">
+  <div className="lock-icon mystery-lock">🔒</div>
+</div>
   )}
 </div>
-              <h3>{obtenido ? qromo.nombre : 'Bloqueado'}</h3>
-              <p>{qromo.rareza}</p>
+
+<h3>
+  {obtenido ? qromo.nombre : 'QRomo Misterioso'}
+</h3>
+
+<p>
+  {qromo.rareza.toUpperCase()}
+</p>
             </div>
           )
         })}
       </main>
+      {qromoSeleccionado && (
+  <div className="modal-overlay" onClick={() => setQromoSeleccionado(null)}>
+    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+      <button className="modal-close" onClick={() => setQromoSeleccionado(null)}>
+        ×
+      </button>
+
+      <img
+        className="modal-qromo-image"
+        src={`/qromos/${String(qromoSeleccionado.id).padStart(3, '0')}.png`}
+        alt={qromoSeleccionado.nombre}
+      />
+
+      <h2>{qromoSeleccionado.nombre}</h2>
+      <p>{qromoSeleccionado.rareza.toUpperCase()}</p>
+    </div>
+  </div>
+)}
     </div>
   )
 }

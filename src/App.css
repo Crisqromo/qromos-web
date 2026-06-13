@@ -352,3 +352,379 @@ button {
     font-size: 0.95rem;
   }
 }
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-bar {
+  width: 85%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #dcb12b, #f4d65a);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #c9d3e5;
+  font-weight: 700;
+}
+.album-progress-bar {
+  width: 90%;
+  height: 12px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.album-progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #dcb12b 0%,
+    #f0ca4d 100%
+  );
+  border-radius: 999px;
+  transition: width .4s ease;
+}
+.stats .stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats .stat-card .album-progress-bar {
+  width: 90%;
+  height: 10px;
+  min-height: 10px;
+  max-height: 10px;
+  padding: 0;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 12px;
+  box-sizing: border-box;
+}
+
+.stats .stat-card .album-progress-fill {
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  padding: 0;
+  background: linear-gradient(90deg, #dcb12b, #f4d65a);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.mystery-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mystery-question {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #dcb12b;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(220,177,43,.4);
+}
+.mystery-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 140px;
+}
+
+.mystery-lock {
+  font-size: 3rem;
+  opacity: 0.9;
+}
+.mystery-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 140px;
+  margin: 10px 0 18px;
+}
+
+.mystery-lock {
+  font-size: 3rem;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 10px rgba(220,177,43,.25));
+}
+.reward-card {
+  margin: 20px auto;
+  max-width: 420px;
+
+  background: linear-gradient(
+    135deg,
+    #dcb12b,
+    #f0ca4d
+  );
+
+  color: #08111f;
+
+  border-radius: 20px;
+
+  padding: 24px;
+
+  box-shadow:
+    0 0 30px rgba(220,177,43,.4),
+    0 15px 40px rgba(0,0,0,.25);
+
+  animation: rewardReveal .6s ease;
+}
+
+.reward-comun {
+  background: linear-gradient(
+    135deg,
+    #dcb12b,
+    #f0ca4d
+  );
+
+  color: #08111f;
+}
+.reward-rara {
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #60a5fa
+  );
+
+  color: white;
+
+  box-shadow:
+    0 0 40px rgba(37,99,235,.6),
+    0 15px 40px rgba(0,0,0,.3);
+}
+.reward-legendaria {
+  background: linear-gradient(
+    135deg,
+    #6d28d9,
+    #f0ca4d,
+    #6d28d9
+  );
+
+  color: white;
+
+  box-shadow:
+    0 0 50px rgba(109,40,217,.7),
+    0 0 30px rgba(240,202,77,.6),
+    0 15px 40px rgba(0,0,0,.35);
+
+  animation:
+    rewardPop .4s ease,
+    legendaryGlow 2s infinite alternate;
+}
+
+.reward-title {
+  font-size: .9rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.reward-card h3 {
+  margin: 12px 0;
+  font-size: 2rem;
+}
+
+.reward-rareza {
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.reward-card span {
+  font-weight: 700;
+}
+
+@keyframes rewardPop {
+  from {
+    opacity: 0;
+    transform: scale(.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.reward-image {
+  width: 140px;
+  margin: 16px auto;
+  display: block;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.25);
+}
+.reward-image {
+  width: 160px;
+  display: block;
+  margin: 18px auto;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.25),
+    0 0 20px rgba(255,255,255,.15);
+
+  transition: transform .3s ease;
+}
+
+.reward-image:hover {
+  transform: scale(1.05);
+}
+@keyframes legendaryGlow {
+  from {
+    box-shadow:
+      0 0 20px rgba(109,40,217,.5),
+      0 0 10px rgba(240,202,77,.3);
+  }
+
+  to {
+    box-shadow:
+      0 0 60px rgba(109,40,217,.9),
+      0 0 30px rgba(240,202,77,.8);
+  }
+}
+.reward-rara {
+  background: linear-gradient(
+    135deg,
+    #1d4ed8 0%,
+    #3b82f6 50%,
+    #60a5fa 100%
+  );
+
+  color: white;
+
+  box-shadow:
+    0 0 40px rgba(37,99,235,.6),
+    0 15px 40px rgba(0,0,0,.3);
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.modal-card {
+  position: relative;
+  background: #111827;
+  border: 2px solid #dcb12b;
+  border-radius: 24px;
+  padding: 24px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(220,177,43,.35);
+  animation: rewardPop .3s ease;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.modal-qromo-image {
+  width: 260px;
+  max-width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 15px 35px rgba(0,0,0,.45);
+}
+
+.modal-card h2 {
+  margin: 18px 0 6px;
+  color: white;
+}
+
+.modal-card p {
+  color: #f0ca4d;
+  font-weight: 900;
+}
+.reward-image-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 20px auto;
+}
+
+.reward-image-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,.35) 0%,
+    rgba(255,255,255,.12) 40%,
+    transparent 75%
+  );
+
+  border-radius: 50%;
+  z-index: 0;
+
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.reward-image {
+  position: relative;
+  z-index: 1;
+}
+@keyframes glowPulse {
+  0% {
+    transform: scale(.9);
+    opacity: .5;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(.9);
+    opacity: .5;
+  }
+}
+
+@keyframes rewardReveal {
+  0% {
+    opacity: 0;
+    transform: scale(.8);
+  }
+
+  70% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
