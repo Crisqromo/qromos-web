@@ -127,26 +127,56 @@ function App() {
 
   const obtenidos = qromos.filter((q) => coleccion.includes(q.id))
 
-  if (!usuario) {
-    return (
-      <div className="login-page">
-        <div className="login-card">
-          <h1>QRomos</h1>
-          <h2>Colección Mundial 2026</h2>
+ if (!usuario) {
+  return (
+    <div className="login-page">
+      <div className="login-bg-glow glow-one"></div>
+      <div className="login-bg-glow glow-two"></div>
 
-          <input placeholder="Nickname" value={nickname} onChange={(e) => setNickname(e.target.value)} />
-          <input placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} />
+      <div className="login-card premium-login">
+        <div className="login-badge">COLECCIÓN MUNDIAL 2026</div>
 
-          <div>
-            <button onClick={entrar}>Entrar</button>
-            <button onClick={crearCuenta}>Crear cuenta</button>
-          </div>
+        <h1 className="login-logo">QRomos</h1>
+        <p className="login-subtitle">
+          Colecciona, desbloquea y completa tus QRomos digitales.
+        </p>
 
-          <p>{mensaje}</p>
+        <div className="login-form">
+          <label>Nickname</label>
+          <input
+            placeholder="Ej. CrisQromos"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+          />
+
+          <label>PIN</label>
+          <input
+            placeholder="Tu PIN secreto"
+            type="password"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+          />
+
+          <button className="primary-login-btn" onClick={entrar}>
+            Entrar a mi álbum
+          </button>
+
+          <button className="secondary-login-btn" onClick={crearCuenta}>
+            Crear cuenta nueva
+          </button>
+        </div>
+
+        {mensaje && <p className="login-message">{mensaje}</p>}
+
+        <div className="login-footer">
+          <span>30 QRomos</span>
+          <span>Rarezas</span>
+          <span>Canje por QR</span>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="album-page">
