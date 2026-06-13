@@ -85,7 +85,7 @@ function App() {
       .select('*')
       .eq('code', limpio)
       .single()
-
+    
     if (codeError || !codeData) {
       setMensajeCanje('Código no válido')
       return
