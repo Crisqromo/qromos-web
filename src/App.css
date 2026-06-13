@@ -785,3 +785,47 @@ button {
     max-width: 260px;
   }
 }
+@media (max-width: 768px) {
+  body,
+  #root,
+  .album-page,
+  .hero,
+  .title-box,
+  .stats,
+  .filters,
+  .grid {
+    max-width: 100vw !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  .hero {
+    border-radius: 0 0 24px 24px !important;
+    padding: 16px 10px !important;
+  }
+
+  .title-box h1 {
+    font-size: 42px !important;
+    line-height: 1 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    margin: 8px 0 !important;
+  }
+
+  .title-box span {
+    width: auto !important;
+    max-width: 95vw !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    white-space: normal !important;
+  }
+
+  .profile-card {
+    max-width: 95vw !important;
+  }
+
+  .logout {
+    max-width: 220px !important;
+  }
+}
