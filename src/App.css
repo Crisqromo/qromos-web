@@ -728,3 +728,60 @@ button {
     transform: scale(1);
   }
 }
+@media (max-width: 768px) {
+  .album-page {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .hero {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 18px 14px;
+    margin: 0 auto 18px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    overflow: hidden;
+  }
+
+  .profile-card {
+    width: 100%;
+    max-width: 340px;
+    box-sizing: border-box;
+  }
+
+  .title-box {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .title-box p {
+    font-size: 14px;
+    letter-spacing: 4px;
+  }
+
+  .title-box h1 {
+    font-size: clamp(48px, 16vw, 78px);
+    line-height: 0.95;
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .title-box span {
+    display: inline-block;
+    max-width: 92%;
+    font-size: 14px;
+    padding: 10px 16px;
+    box-sizing: border-box;
+  }
+
+  .logout {
+    width: 100%;
+    max-width: 260px;
+  }
+}
