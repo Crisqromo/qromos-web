@@ -41,13 +41,19 @@ function App() {
   }
 
   async function cargarColeccion(userId) {
-    const { data } = await supabase
-      .from('collection')
-      .select('qromo_id')
-      .eq('user_id', userId)
+  const { data, error } = await supabase
+    .from('collection')
+    .select('qromo_id')
+    .eq('user_id', Number(userId))
 
-    setColeccion(data?.map((item) => item.qromo_id) || [])
+  if (error) {
+    console.log('Error cargando colección:', error)
+    setColeccion([])
+    return
   }
+
+  setColeccion(data?.map((item) => Number(item.qromo_id)) || [])
+}
 
   async function crearCuenta() {
     if (!nickname || !pin) return setMensaje('Escribe nickname y PIN')
@@ -140,7 +146,9 @@ setMensajeCanje(
   const qromosFiltrados =
     filtro === 'todos' ? qromos : qromos.filter((q) => q.rareza === filtro)
 
-  const obtenidos = qromos.filter((q) => coleccion.includes(q.id))
+  const obtenidos = qromos.filter((q) =>
+  coleccion.includes(Number(q.id))
+)
   const porcentaje = Math.round((obtenidos.length / 30) * 100)
 
  if (!usuario) {
@@ -286,7 +294,7 @@ setMensajeCanje(
 
       <main className="grid">
         {qromosFiltrados.map((qromo) => {
-          const obtenido = coleccion.includes(qromo.id)
+          const obtenido = coleccion.includes(Number(qromo.id))
 
           return (
             <div
