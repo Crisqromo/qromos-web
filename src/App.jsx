@@ -118,7 +118,14 @@ function App() {
       .eq('code', limpio)
 
     await cargarColeccion(usuario.id)
-    setCodigo('')
+
+setColeccion((prev) =>
+  prev.includes(codeData.qromo_id)
+    ? prev
+    : [...prev, codeData.qromo_id]
+)
+
+setCodigo('')
 
     const qromoGanado = qromos.find(
   q => q.id === codeData.qromo_id
