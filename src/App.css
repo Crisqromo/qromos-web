@@ -861,3 +861,27 @@ button {
     max-width: 120px !important;
   }
 }
+.support-box {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.15);
+  text-align: center;
+}
+
+.support-box h4 {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #ccc;
+  font-weight: 500;
+}
+
+.support-box a {
+  color: #d8b53f;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.support-box a:hover {
+  text-decoration: underline;
+}

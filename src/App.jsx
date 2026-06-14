@@ -197,8 +197,15 @@ setMensajeCanje(
           <span>Rarezas</span>
           <span>Canje por QR</span>
         </div>
+        <div className="support-box">
+  <h4>¿Tienes dudas, quejas o sugerencias?</h4>
+  <a href="mailto:qromos.oficial@gmail.com">
+    qromos.oficial@gmail.com
+  </a>
+</div>
       </div>
     </div>
+    
   )
 }
 
