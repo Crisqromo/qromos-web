@@ -14,6 +14,7 @@ function App() {
   const [mensajeCanje, setMensajeCanje] = useState('')
   const [ultimoQromo, setUltimoQromo] = useState(null)
   const [qromoSeleccionado, setQromoSeleccionado] = useState(null)
+  const [temporadaActiva, setTemporadaActiva] = useState('proxima')
 
   useEffect(() => {
     cargarQromos()
@@ -158,11 +159,11 @@ setMensajeCanje(
       <div className="login-bg-glow glow-two"></div>
 
       <div className="login-card premium-login">
-        <div className="login-badge">COLECCIÓN MUNDIAL 2026</div>
+        <div className="login-badge">COLECCIONES POR TEMPORADA</div>
 
         <h1 className="login-logo">QRomos</h1>
         <p className="login-subtitle">
-          Colecciona, desbloquea y completa tus QRomos digitales.
+          Conserva tus colecciones y descubre la siguiente temporada de QRomos.
         </p>
 
         <div className="login-form">
@@ -193,9 +194,8 @@ setMensajeCanje(
         {mensaje && <p className="login-message">{mensaje}</p>}
 
         <div className="login-footer">
-          <span>30 QRomos</span>
-          <span>Rarezas</span>
-          <span>Canje por QR</span>
+          <span>Temporada 1 archivada</span>
+          <span>Nueva temporada próximamente</span>
         </div>
         <div className="support-box">
   <h4>¿Tienes dudas, quejas o sugerencias?</h4>
@@ -223,11 +223,35 @@ setMensajeCanje(
         <div className="title-box">
           <p>MI ÁLBUM</p>
           <h1>QRomos</h1>
-          <span>COLECCIÓN MUNDIAL 2026</span>
+          <span>{temporadaActiva === 'mundial-2026' ? 'TEMPORADA 1 · MUNDIAL 2026' : 'NUEVA TEMPORADA · PRÓXIMAMENTE'}</span>
         </div>
 
         <button className="logout" onClick={() => setUsuario(null)}>Cerrar sesión</button>
       </header>
+
+      <nav className="season-switcher" aria-label="Seleccionar temporada">
+        <button className={temporadaActiva === 'proxima' ? 'season-option active' : 'season-option'} onClick={() => setTemporadaActiva('proxima')}>
+          <small>Nueva temporada</small><strong>Próximamente</strong><span>En preparación</span>
+        </button>
+        <button className={temporadaActiva === 'mundial-2026' ? 'season-option active' : 'season-option'} onClick={() => setTemporadaActiva('mundial-2026')}>
+          <small>Temporada 1</small><strong>Mundial 2026</strong><span className="archive-label">Archivada</span>
+        </button>
+      </nav>
+
+      {temporadaActiva === 'proxima' ? (
+        <main className="coming-soon">
+          <div className="coming-soon-mark">QR</div>
+          <p className="eyebrow">LA HISTORIA CONTINÚA</p>
+          <h2>Nueva temporada<br />próximamente</h2>
+          <p className="coming-soon-copy">Estamos preparando una colección completamente nueva. Mientras tanto, tu álbum del Mundial 2026 permanece guardado y puedes consultarlo cuando quieras.</p>
+          <button onClick={() => setTemporadaActiva('mundial-2026')}>Ver mi colección del Mundial 2026</button>
+        </main>
+      ) : (
+        <>
+      <div className="archive-notice">
+        <div><strong>Temporada archivada</strong><p>Tu progreso y todos los QRomos obtenidos se conservan aquí.</p></div>
+        <span>Colección cerrada</span>
+      </div>
 
         <section className="stats">
   <div className="stat-card">
@@ -248,7 +272,7 @@ setMensajeCanje(
         <div><small>Legendarias</small><strong>{obtenidos.filter(q => q.rareza === 'legendaria').length} / 3</strong></div>
       </section>
 
-      <section style={{ textAlign: 'center', margin: '24px 0' }}>
+      {temporadaActiva === 'canje-habilitado' && <section style={{ textAlign: 'center', margin: '24px 0' }}>
         <h2>Canjear código</h2>
         <input
           placeholder="Ej. TEST-BRA-005"
@@ -290,7 +314,7 @@ setMensajeCanje(
     </span>
   </div>
 )}
-      </section>
+      </section>}
 
       <div className="filters">
         <button onClick={() => setFiltro('todos')}>Todos</button>
@@ -353,8 +377,8 @@ setMensajeCanje(
     </div>
   </div>
 )}
+        </>
+      )}
     </div>
   )
 }
-
-export default App
