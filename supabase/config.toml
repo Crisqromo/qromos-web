@@ -1,0 +1,4 @@
+project_id = "pgquzbzupirlbtucrjfg"
+
+[functions.pvp-battle]
+verify_jwt = false
