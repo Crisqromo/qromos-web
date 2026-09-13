@@ -342,7 +342,6 @@ function App() {
           <div>
             <strong>{usuario.nickname}</strong>
             <p>Coleccionista & Artesano</p>
-            <button onClick={() => setQromosDesbloqueados(Object.values(RECETAS).map(r => r.id))} className="debug-btn">+ Completar Altar</button>
           </div>
         </div>
         
