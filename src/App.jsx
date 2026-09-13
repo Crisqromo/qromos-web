@@ -72,10 +72,7 @@ function App() {
   })
 
   // Inventario inicial surtido
-  const [inventario, setInventario] = useState({ 
-    'M01': 3, 'M02': 2, 'M05': 3, 'M06': 1, 'M18': 2,
-    'M03': 1, 'M04': 2, 'M07': 2, 'M08': 3, 'M10': 2
-  }) 
+  const [inventario, setInventario] = useState({}) 
 
   const [mesaTrabajo, setMesaTrabajo] = useState([])
   const [slotSeleccionado, setSlotSeleccionado] = useState(null)
