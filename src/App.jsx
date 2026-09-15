@@ -249,38 +249,51 @@ function App() {
     setInventario(inv)
   }
 
-  async function canjearQR() {
+async function canjearQR() {
     if (!codigoDulce) return setMensajeCanje('Escribe o escanea un código.')
-    setMensajeCanje('Validando código en la base de datos...')
+    
+    // Limpiamos espacios accidentales y lo pasamos a minúsculas para Postgres
+    const codigoLimpio = codigoDulce.trim().toLowerCase()
+    setMensajeCanje(`Buscando: ${codigoLimpio.substring(0,8)}...`)
 
-    // Verificar si el QR existe
-    const { data: qrData, error: qrError } = await supabase.from('codigos_qr').select('*').eq('code', codigoDulce.toLowerCase()).single()
+    // Usamos maybeSingle() para que no marque error si simplemente no lo encuentra
+    const { data: qrData, error: qrError } = await supabase
+      .from('codigos_qr')
+      .select('*')
+      .eq('code', codigoLimpio)
+      .maybeSingle()
 
-    if (qrError || !qrData) {
-      return setMensajeCanje('❌ Código no válido o no pertenece a esta temporada.')
+    if (qrError) {
+      console.error("Error de Supabase:", qrError)
+      return setMensajeCanje(`Error técnico: ${qrError.message}`)
     }
+    
+    if (!qrData) {
+      return setMensajeCanje('❌ Código no encontrado en la base de datos.')
+    }
+    
     if (qrData.is_redeemed) {
       return setMensajeCanje('⚠️ Este código ya fue reclamado por un alma.')
     }
 
-    // Marcar el QR como canjeado por el usuario actual
+    // Marcar el QR como canjeado
     const { error: updateError } = await supabase.from('codigos_qr').update({
       is_redeemed: true,
       redeemed_by: usuario.id,
       redeemed_at: new Date().toISOString()
-    }).eq('code', codigoDulce.toLowerCase())
+    }).eq('code', codigoLimpio)
 
     if (updateError) {
-      return setMensajeCanje('Hubo un error al canjear, intenta de nuevo.')
+      console.error("Error al actualizar:", updateError)
+      return setMensajeCanje(`Error al guardar: ${updateError.message}`)
     }
 
-    // Éxito: Se agrega al inventario local instantáneamente
+    // Éxito
     const matId = qrData.material_id
     setInventario(prev => ({ ...prev, [matId]: (prev[matId] || 0) + 1 }))
     setMensajeCanje(`✨ ¡Obtuviste material para la ofrenda!`)
     setCodigoDulce('')
   }
-
   function colocarEnSlot(matId) {
     if (slotSeleccionado === null) return
     if (!inventario[matId] || inventario[matId] <= 0) return
