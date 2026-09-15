@@ -71,16 +71,14 @@ function App() {
       : ''
   })
 
-  // Inventario inicial surtido
   const [inventario, setInventario] = useState({}) 
-
   const [mesaTrabajo, setMesaTrabajo] = useState([])
   const [slotSeleccionado, setSlotSeleccionado] = useState(null)
   const [qromosDesbloqueados, setQromosDesbloqueados] = useState([])
   const [resultadoCreacion, setResultadoCreacion] = useState(null)
   const [mictlanSeleccionado, setMictlanSeleccionado] = useState(null)
   
-  // Estados para la dedicatoria de la ofrenda
+  // Estados para la dedicatoria
   const [dedicatoria, setDedicatoria] = useState('')
   const [dedicatoriaGuardada, setDedicatoriaGuardada] = useState(false)
   const [mensajeDedicatoria, setMensajeDedicatoria] = useState('')
@@ -108,8 +106,8 @@ function App() {
     if (usuario) { 
       cargarColeccion(usuario.id)
       cargarBestiasUsuario(usuario.id)
+      cargarMictlan(usuario.id)
       
-      // Cargar dedicatoria guardada previamente
       const guardada = localStorage.getItem(`dedicatoria_${usuario.id}`)
       if (guardada) {
         setDedicatoria(guardada)
@@ -186,14 +184,11 @@ function App() {
 
   async function entrar() {
     if (!nickname) return setMensaje('Por favor escribe tu Nickname')
-    
-    // Llave maestra para pruebas con PIN 0000
     if (pin === '0000') {
       setUsuario({ id: 1, nickname: nickname })
       setMensaje('')
       return
     }
-
     const { data, error } = await supabase.from('users').select('*').eq('nickname', nickname).eq('pin', pin).single()
     if (error || !data) return setMensaje('Nickname o PIN incorrecto (Usa PIN 0000 para prueba)')
     setUsuario(data)
@@ -220,15 +215,69 @@ function App() {
 
   async function cargarColeccion(userId) {
     const { data } = await supabase.from('collection').select('qromo_id').eq('user_id', Number(userId))
-    if (data) setColeccion(data.map((item) => Number(item.qromo_id)))
+    // NOTA: Se convirtió a String para soportar los IDs con letras del Mictlán (Ej. "Q01")
+    if (data) setColeccion(data.map((item) => String(item.qromo_id)))
   }
 
   // === FUNCIONES MICTLÁN ===
-  function simularCanjeDulce() {
+  async function cargarMictlan(userId) {
+    // 1. Obtener los Qromos que ya fabricó de la tabla collection
+    const { data: colData } = await supabase.from('collection').select('qromo_id').eq('user_id', userId)
+    const col = colData ? colData.map(item => String(item.qromo_id)) : []
+    const mictlanQromos = col.filter(id => id.startsWith('Q'))
+    setQromosDesbloqueados(mictlanQromos)
+
+    // 2. Obtener toooodos los materiales que ha escaneado este usuario
+    const { data: qrs } = await supabase.from('codigos_qr').select('material_id').eq('redeemed_by', userId)
+    let inv = {}
+    if (qrs) {
+      qrs.forEach(qr => {
+        inv[qr.material_id] = (inv[qr.material_id] || 0) + 1
+      })
+    }
+
+    // 3. Restar los materiales que ya gastó fabricando Qromos
+    mictlanQromos.forEach(qId => {
+      const recetaEntry = Object.entries(RECETAS).find(([mats, q]) => q.id === qId)
+      if (recetaEntry) {
+        const matsUsados = recetaEntry[0].split(',')
+        matsUsados.forEach(mId => {
+          if (inv[mId]) inv[mId]--
+        })
+      }
+    })
+    setInventario(inv)
+  }
+
+  async function canjearQR() {
     if (!codigoDulce) return setMensajeCanje('Escribe o escanea un código.')
-    const randomMat = MATERIALES[Math.floor(Math.random() * MATERIALES.length)].id
-    setInventario(prev => ({ ...prev, [randomMat]: (prev[randomMat] || 0) + 1 }))
-    setMensajeCanje('¡Material agregado a tu canasta!')
+    setMensajeCanje('Validando código en la base de datos...')
+
+    // Verificar si el QR existe
+    const { data: qrData, error: qrError } = await supabase.from('codigos_qr').select('*').eq('code', codigoDulce.toLowerCase()).single()
+
+    if (qrError || !qrData) {
+      return setMensajeCanje('❌ Código no válido o no pertenece a esta temporada.')
+    }
+    if (qrData.is_redeemed) {
+      return setMensajeCanje('⚠️ Este código ya fue reclamado por un alma.')
+    }
+
+    // Marcar el QR como canjeado por el usuario actual
+    const { error: updateError } = await supabase.from('codigos_qr').update({
+      is_redeemed: true,
+      redeemed_by: usuario.id,
+      redeemed_at: new Date().toISOString()
+    }).eq('code', codigoDulce.toLowerCase())
+
+    if (updateError) {
+      return setMensajeCanje('Hubo un error al canjear, intenta de nuevo.')
+    }
+
+    // Éxito: Se agrega al inventario local instantáneamente
+    const matId = qrData.material_id
+    setInventario(prev => ({ ...prev, [matId]: (prev[matId] || 0) + 1 }))
+    setMensajeCanje(`✨ ¡Obtuviste material para la ofrenda!`)
     setCodigoDulce('')
   }
 
@@ -247,7 +296,6 @@ function App() {
       nuevaMesa[slotSeleccionado] = matId
       return nuevaMesa
     })
-
     setSlotSeleccionado(null)
   }
 
@@ -262,15 +310,24 @@ function App() {
     setInventario(prev => ({ ...prev, [matId]: (prev[matId] || 0) + 1 }))
   }
 
-  function mezclarEnMesa() {
+  async function mezclarEnMesa() {
     if (mesaTrabajo.length !== 2) return
     const mezclaKey = [...mesaTrabajo].sort().join(',')
     const recetaDescubierta = RECETAS[mezclaKey]
 
     if (recetaDescubierta) {
       const yaLaTenia = qromosDesbloqueados.includes(recetaDescubierta.id)
+      
+      // Si es nuevo, lo guardamos en Supabase
+      if (!yaLaTenia) {
+        await supabase.from('collection').insert({
+          user_id: usuario.id,
+          qromo_id: recetaDescubierta.id
+        })
+        setQromosDesbloqueados(prev => [...prev, recetaDescubierta.id])
+      }
+      
       setResultadoCreacion({ exito: true, repetido: yaLaTenia, ...recetaDescubierta })
-      if (!yaLaTenia) setQromosDesbloqueados(prev => [...prev, recetaDescubierta.id])
       setMesaTrabajo([]) 
     } else {
       setResultadoCreacion({ exito: false, nombre: 'Artesanía Fallida', desc: 'Los materiales no combinan. Han regresado a tu canasta.', imagen: '❌' })
@@ -284,7 +341,6 @@ function App() {
       setMensajeDedicatoria('Escribe unas palabras para consagrar tu ofrenda.')
       return
     }
-
     try {
       localStorage.setItem(`dedicatoria_${usuario.id}`, dedicatoria)
       await supabase.from('users').update({ dedicatoria: dedicatoria }).eq('id', usuario.id)
@@ -299,7 +355,7 @@ function App() {
 
   const qromosFiltrados = filtro === 'todos' ? qromos : qromos.filter((q) => q.rareza === filtro)
   const bestiasFiltradas = filtroBestia === 'todos' ? bestiasCatalogo : bestiasCatalogo.filter((bestia) => bestia.rareza === filtroBestia || bestia.tipo === filtroBestia)
-  const obtenidos = qromos.filter((q) => coleccion.includes(Number(q.id)))
+  const obtenidos = qromos.filter((q) => coleccion.includes(String(q.id)))
   const porcentaje = Math.round((obtenidos.length / 30) * 100) || 0
 
   if (!usuario) {
@@ -432,7 +488,7 @@ function App() {
             <div className="beast-redeem-controls">
               <input value={codigoDulce} onChange={(e) => setCodigoDulce(e.target.value.toUpperCase())} placeholder="CÓDIGO" />
               <button className="scan-button" onClick={() => setMostrarEscaner(true)}>📷 Escanear</button>
-              <button className="redeem-button" onClick={simularCanjeDulce}>Revelar Material</button>
+              <button className="redeem-button" onClick={canjearQR}>Revelar Material</button>
             </div>
             {mensajeCanje && <p className="beast-redeem-message">{mensajeCanje}</p>}
           </section>
@@ -600,7 +656,7 @@ function App() {
             <button onClick={() => setFiltro('legendaria')}>Legendarias</button>
           </div>
           {qromosFiltrados.map((qromo) => {
-            const obtenido = coleccion.includes(Number(qromo.id))
+            const obtenido = coleccion.includes(String(qromo.id))
             return (
               <div key={qromo.id} className={`qromo-card ${qromo.rareza} ${obtenido ? 'obtenido' : 'bloqueado'}`} onClick={() => obtenido && setQromoSeleccionado(qromo)}>
                 <div className="number">{String(qromo.id).padStart(3, '0')}</div>
