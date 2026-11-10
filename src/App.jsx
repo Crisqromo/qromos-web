@@ -91,7 +91,7 @@ function App() {
   const [temporadaActiva, setTemporadaActiva] = useState('navidad')
 
   // === ESTADOS TEMPORADA 4 (NAVIDAD GACHAPÓN) ===
-  const [monedasNavidad, setMonedasNavidad] = useState(5) // 5 monedas gratis para probar
+  const [monedasNavidad, setMonedasNavidad] = useState(0)
   const [navidadDesbloqueados, setNavidadDesbloqueados] = useState([])
   const [premioNavidad, setPremioNavidad] = useState(null)
   const [isSpinning, setIsSpinning] = useState(false)
@@ -408,11 +408,14 @@ function App() {
     setInventario(inv)
   }
 
-  // === CANJEAR CÓDIGO PARA GANAR MONEDAS EN NAVIDAD ===
-  async function canjearQRNavidad() {
-    if (!codigoDulce) return setMensajeCanje('Escribe o escanea un código.')
-    const codigoLimpio = codigoDulce.trim().toLowerCase()
-    setMensajeCanje(`Buscando código...`)
+  
+ // === CANJEAR CÓDIGO EXCLUSIVAMENTE POR ESCÁNER QR ===
+async function canjearQRNavidad(codigoEscaneado) {
+  if (!codigoEscaneado) return setMensajeCanje('Escanea un código QR válido.');
+  const codigoLimpio = codigoEscaneado.trim().toLowerCase();
+  setMensajeCanje(`Buscando código...`);
+
+  
 
     const { data: qrData, error: qrError } = await supabase
       .from('codigos_qr')
@@ -434,7 +437,6 @@ function App() {
     // ¡Éxito! Sumamos una moneda de Navidad al usuario
     setMonedasNavidad(prev => prev + 1)
     setMensajeCanje(`✨ ¡Código canjeado con éxito! +1 Moneda QRomos`)
-    setCodigoDulce('')
   }
   
   function colocarEnSlot(matId) {
