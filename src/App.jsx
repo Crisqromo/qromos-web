@@ -220,10 +220,21 @@ useEffect(() => {
             if (codigoDetectado) {
               console.log("¡QR Encontrado!", codigoDetectado.data);
               
-              // Si encuentra el código: detenemos la cámara, cerramos el modal y canjeamos
               clearInterval(intervaloEscaneo);
               setMostrarEscaner(false); 
-              canjearQRNavidad(codigoDetectado.data); 
+              
+              // 👇 NUEVO: Limpiamos la URL para extraer solo "navidad-0001"
+              let textoLeido = codigoDetectado.data;
+              let codigoPuro = textoLeido;
+              
+              // Si el texto trae la URL, sacamos el parámetro exacto
+              if (textoLeido.includes('?code=')) {
+                const parametros = new URLSearchParams(textoLeido.split('?')[1]);
+                codigoPuro = parametros.get('code') || textoLeido;
+              }
+              
+              // Ahora sí, le pasamos el código limpio a tu función
+              canjearQRNavidad(codigoPuro); 
             }
           }
         }, 300);
