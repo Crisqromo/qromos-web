@@ -216,22 +216,29 @@ useEffect(() => {
             
             // jsQR analiza la foto buscando el código
             const codigoDetectado = jsQR(imageData.data, imageData.width, imageData.height);
-
-            if (codigoDetectado) {
+if (codigoDetectado) {
               console.log("¡QR Encontrado!", codigoDetectado.data);
               
               clearInterval(intervaloEscaneo);
               setMostrarEscaner(false); 
               
-              // 👇 NUEVO: Limpiamos la URL para extraer solo "navidad-0001"
               let textoLeido = codigoDetectado.data;
               let codigoPuro = textoLeido;
               
-              // Si el texto trae la URL, sacamos el parámetro exacto
-              if (textoLeido.includes('?code=')) {
-                const parametros = new URLSearchParams(textoLeido.split('?')[1]);
-                codigoPuro = parametros.get('code') || textoLeido;
+              try {
+                // Forma más profesional y segura de extraer parámetros de una URL
+                if (textoLeido.startsWith('http')) {
+                  const urlObj = new URL(textoLeido);
+                  codigoPuro = urlObj.searchParams.get('code') || textoLeido;
+                } else if (textoLeido.includes('code=')) {
+                  codigoPuro = textoLeido.split('code=')[1].split('&')[0];
+                }
+              } catch (e) {
+                console.log("Error limpiando URL, usando texto original.");
               }
+              
+              // ⚠️ ALERTA CLAVE PARA DEPURAR (Nos dirá qué está fallando)
+              alert("Código que intentará canjear: [" + codigoPuro + "]");
               
               // Ahora sí, le pasamos el código limpio a tu función
               canjearQRNavidad(codigoPuro); 
