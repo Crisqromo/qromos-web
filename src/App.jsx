@@ -353,10 +353,14 @@ useEffect(() => {
       setMensaje('')
       return
     }
-    const { data, error } = await supabase.from('users').select('*').eq('nickname', nickname).eq('pin', pin).single()
-    if (error || !data) return setMensaje('Nickname o PIN incorrecto (Usa PIN 0000 para prueba)')
-    setUsuario(data)
-  }
+   const { data, error } = await supabase.from('users').select('*').eq('nickname', nickname).eq('pin', pin).single()
+  
+  if (error || !data) return setMensaje('Nickname o PIN incorrecto (Usa PIN 0000 para prueba)')
+  
+  setUsuario(data)
+  // 👇 NUEVA LÍNEA: Cargamos las monedas que el usuario ya tenía guardadas
+  setMonedasNavidad(data.monedas_navidad || 0)
+}
 
   async function cargarBestias() {
     const { data, error } = await supabase.from('beasts').select('id, name, country, rarity, beast_type, power, image').order('id')
@@ -448,7 +452,27 @@ async function canjearQRNavidad(codigoEscaneado) {
     if (updateError) return setMensajeCanje(`Error al guardar: ${updateError.message}`)
 
     // ¡Éxito! Sumamos una moneda de Navidad al usuario
-    setMonedasNavidad(prev => prev + 1)
+    // ... (tu código anterior de validación del QR se queda igualito)
+
+if (updateError) return setMensajeCanje(`Error al guardar: ${updateError.message}`)
+
+// NUEVO: Consultamos cuántas monedas tiene actualmente en Supabase
+const { data: usuarioDb } = await supabase
+      .from('users')
+      .select('monedas_navidad')
+      .eq('id', usuario.id)
+      .single()
+
+    const totalMonedas = (usuarioDb?.monedas_navidad || 0) + 1
+
+    // Guardamos el nuevo total en su cuenta de Supabase
+    await supabase
+      .from('users')
+      .update({ monedas_navidad: totalMonedas })
+      .eq('id', usuario.id)
+
+    // Actualizamos el número en la pantalla
+    setMonedasNavidad(totalMonedas)
     setMensajeCanje(`✨ ¡Código canjeado con éxito! +1 Moneda QRomos`)
   }
   
