@@ -691,7 +691,7 @@ async function canjearQRNavidad(codigoEscaneado) {
               <p>Cada QR te otorga 1 oportunidad para girar el Gachapón.</p>
             </div>
             <div className="beast-redeem-controls">
-              <input value={codigoDulce} onChange={(e) => setCodigoDulce(e.target.value.toUpperCase())} placeholder="CÓDIGO QR" />
+              
               <button className="scan-button" onClick={() => setMostrarEscaner(true)}>📷 Escanear</button>
               <button className="redeem-button" onClick={canjearQRNavidad}>Canjear QR</button>
             </div>
@@ -1034,14 +1034,18 @@ async function canjearQRNavidad(codigoEscaneado) {
       )}
 
       {mostrarEscaner && (
-        <div className="modal-overlay scanner-overlay" onClick={() => setMostrarEscaner(false)}>
-          <div className="scanner-card" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setMostrarEscaner(false)}>×</button>
-            <h2 style={{color: '#ff8c00', marginBottom: '10px'}}>Escanea el QR</h2>
-            <div className="scanner-frame"><video ref={videoRef} muted playsInline style={{width: '100%', borderRadius: '8px'}} /></div>
-          </div>
-        </div>
-      )}
+  <div className="modal-overlay scanner-overlay" onClick={() => setMostrarEscaner(false)}>
+    <div className="scanner-card" onClick={(e) => e.stopPropagation()}>
+      <button className="modal-close" onClick={() => setMostrarEscaner(false)}>×</button>
+      <h2 style={{color: '#ff8c00', marginBottom: '10px'}}>Escanea el QR</h2>
+      
+      {/* Añadimos un min-height y display flex/block para forzar el espacio */}
+      <div className="scanner-frame" style={{ width: '100%', minHeight: '280px', background: '#000', borderRadius: '8px', overflow: 'hidden' }}>
+        <video ref={videoRef} muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+      </div>
+    </div>
+  </div>
+)}
 
     </div>
   )
