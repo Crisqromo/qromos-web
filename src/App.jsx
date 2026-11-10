@@ -188,6 +188,41 @@ useEffect(() => {
     }
   }, [temporadaActiva, usuario])
 
+  useEffect(() => {
+  let streamActivo = null;
+
+  const encenderCamara = async () => {
+    // Si el modal está abierto y el recuadro de video existe en la pantalla
+    if (mostrarEscaner && videoRef.current) {
+      try {
+        // Pedimos permiso para usar la cámara trasera del celular
+        streamActivo = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' } 
+        });
+        
+        // Conectamos la señal de la cámara al recuadro negro
+        videoRef.current.srcObject = streamActivo;
+        
+        // ¡Forzamos a que el video empiece a reproducirse!
+        await videoRef.current.play();
+        
+      } catch (err) {
+        console.error("Error al encender cámara:", err);
+        alert("Asegúrate de darle permisos de cámara al navegador.");
+      }
+    }
+  };
+
+  encenderCamara();
+
+  // Función de limpieza: apagar la cámara cuando cierras el modal
+  return () => {
+    if (streamActivo) {
+      streamActivo.getTracks().forEach(track => track.stop());
+    }
+  };
+}, [mostrarEscaner]); // Se ejecuta cada vez que abres o cierras el escáner
+
   // === EFECTO DE FÍSICAS: MÁQUINA GACHAPÓN (MATTER.JS) ===
   useEffect(() => {
     if (!usuario) return; // <-- Espera a que inicies sesión
