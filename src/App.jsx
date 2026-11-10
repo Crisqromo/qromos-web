@@ -3,6 +3,7 @@ import { supabase } from './supabase'
 import { bestias as bestiasIniciales } from './data/bestias'
 import Matter from 'matter-js'
 import './App.css'
+import jsQR from 'jsqr';
 
 // === 1. LOS 18 MATERIALES DEL MICTLÁN ===
 const MATERIALES = [
@@ -188,40 +189,59 @@ useEffect(() => {
     }
   }, [temporadaActiva, usuario])
 
-  useEffect(() => {
+useEffect(() => {
   let streamActivo = null;
+  let intervaloEscaneo = null; 
 
   const encenderCamara = async () => {
-    // Si el modal está abierto y el recuadro de video existe en la pantalla
     if (mostrarEscaner && videoRef.current) {
       try {
-        // Pedimos permiso para usar la cámara trasera del celular
-        streamActivo = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: 'environment' } 
-        });
-        
-        // Conectamos la señal de la cámara al recuadro negro
+        // 1. Encendemos el video
+        streamActivo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         videoRef.current.srcObject = streamActivo;
-        
-        // ¡Forzamos a que el video empiece a reproducirse!
         await videoRef.current.play();
-        
+
+        // 2. Creamos un "lienzo" invisible para analizar el video
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+
+        // 3. Revisamos la cámara cada 300 milisegundos buscando un QR
+        intervaloEscaneo = setInterval(() => {
+          if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+            canvas.width = videoRef.current.videoWidth;
+            canvas.height = videoRef.current.videoHeight;
+            context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            
+            // jsQR analiza la foto buscando el código
+            const codigoDetectado = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (codigoDetectado) {
+              console.log("¡QR Encontrado!", codigoDetectado.data);
+              
+              // Si encuentra el código: detenemos la cámara, cerramos el modal y canjeamos
+              clearInterval(intervaloEscaneo);
+              setMostrarEscaner(false); 
+              canjearQRNavidad(codigoDetectado.data); 
+            }
+          }
+        }, 300);
+
       } catch (err) {
         console.error("Error al encender cámara:", err);
-        alert("Asegúrate de darle permisos de cámara al navegador.");
       }
     }
   };
 
   encenderCamara();
 
-  // Función de limpieza: apagar la cámara cuando cierras el modal
+  // 4. Limpiamos y apagamos todo al cerrar la ventana
   return () => {
-    if (streamActivo) {
-      streamActivo.getTracks().forEach(track => track.stop());
-    }
+    if (streamActivo) streamActivo.getTracks().forEach(track => track.stop());
+    if (intervaloEscaneo) clearInterval(intervaloEscaneo);
   };
-}, [mostrarEscaner]); // Se ejecuta cada vez que abres o cierras el escáner
+}, [mostrarEscaner]);
 
   // === EFECTO DE FÍSICAS: MÁQUINA GACHAPÓN (MATTER.JS) ===
   useEffect(() => {
