@@ -99,6 +99,19 @@ function App() {
   const gachaponRef = useRef(null)
   const engineRef = useRef(null)
 
+  // Agrega esto donde tengas tus otros useEffect o al inicio de tu componente principal:
+useEffect(() => {
+  const queryParams = new URLSearchParams(window.location.search);
+  const codigoUrl = queryParams.get('code');
+
+  // Si hay un código en el enlace y el usuario ya está cargado, lo canjea en automático
+  if (codigoUrl && usuario && usuario.id) {
+    canjearQRNavidad(codigoUrl);
+    // Limpiamos la URL para que no se quede el ?code= en la barra de direcciones
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}, [usuario]);
+
   // === ESTADOS PARA CONTROL DE AUDIO ===
   const [isPlayingMusic, setIsPlayingMusic] = useState(false)
   const backgroundAudioRef = useRef(null)

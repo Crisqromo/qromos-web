@@ -11,9 +11,9 @@ async function generarPDFsPorHoja() {
     fs.mkdirSync('./pdf_hojas_navidad');
   }
 
-  console.log('🚀 Generando las hojas tamaño carta con 100 QR cada una...');
+  console.log('🚀 Generando las hojas tamaño carta con el dominio correcto (qromo.com.mx)...');
 
-  // Dividimos los 1,000 códigos en bloques de 100 (generará 10 archivos PDF en total)
+  // Dividimos los 1,000 códigos en bloques de 100 (10 archivos PDF en total)
   for (let hoja = 0; hoja < totalCodigos / codigosPorHoja; hoja++) {
     const doc = new PDFDocument({ size: 'LETTER', margin: 30 });
     const rutaPdf = `./pdf_hojas_navidad/hoja_${hoja + 1}_codigos_${hoja * 100 + 1}_al_${(hoja + 1) * 100}.pdf`;
@@ -36,7 +36,10 @@ async function generarPDFsPorHoja() {
 
       const numeroFormateado = String(indexGlobal).padStart(4, '0');
       const codigo = `navidad-${numeroFormateado}`;
-      const textoQR = `https://qromos.com/canjear?code=${codigo}`;
+      
+      // URL corregida con tu dominio oficial
+      const textoQR = `https://www.qromo.com.mx/canjear?code=${codigo}`;
+      const rutaArchivo = `./qrs_navidad/${codigo}.png`;
 
       // Generamos el QR como imagen temporal en buffer base64
       const qrBuffer = await QRCode.toBuffer(textoQR, { width: 150, margin: 1 });
@@ -50,14 +53,14 @@ async function generarPDFsPorHoja() {
       // Dibujamos el QR en el PDF
       doc.image(qrBuffer, x, y, { width: 45, height: 45 });
       
-      // Ponemos el texto del código chiquito abajo del QR
+      // Ponemos el texto del código abajo del QR
       doc.fontSize(7).text(codigo, x, y + 46, { width: 45, align: 'center' });
     }
 
     doc.end();
   }
 
-  console.log('¡Listo! Se han generado los PDFs en la carpeta "pdf_hojas_navidad" con 100 QR cada uno.');
+  console.log('¡Listo! Se han generado los nuevos PDFs en la carpeta "pdf_hojas_navidad" con el dominio correcto.');
 }
 
 generarPDFsPorHoja();
