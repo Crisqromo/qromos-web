@@ -352,23 +352,42 @@ if (codigoDetectado) {
     setIsSpinning(true);
 
     // 👇 REEMPLAZA "setMonedasNavidad..." POR ESTE BLOQUE 👇
-    const { data: usuarioDb } = await supabase
+    // 👇 BLOQUE CON DETECTOR DE ERRORES 👇
+    if (!usuario || !usuario.id) {
+      alert("Error: No se detecta el ID del usuario al intentar cobrar.");
+      setIsSpinning(false);
+      return;
+    }
+
+    const { data: usuarioDb, error: errorSelect } = await supabase
       .from('users')
       .select('monedas_navidad')
       .eq('id', usuario.id)
       .single();
 
+    if (errorSelect) alert("Error leyendo en Supabase: " + errorSelect.message);
+
     const monedasRestantes = (usuarioDb?.monedas_navidad || 0) - 1;
 
-    await supabase
+    // Intentamos descontar y atrapamos el error si falla
+    const { error: errorUpdate } = await supabase
       .from('users')
       .update({ monedas_navidad: monedasRestantes })
       .eq('id', usuario.id);
 
+    if (errorUpdate) {
+      alert("Supabase no dejó descontar: " + errorUpdate.message);
+    } else {
+      console.log("Descuento guardado en la nube exitosamente.");
+    }
+
+    setMonedasNavidad(monedasRestantes);
+    // 👆 TERMINA BLOQUE CON DETECTOR DE ERRORES 👆
+
     setMonedasNavidad(monedasRestantes);
     // 👆 TERMINA EL NUEVO CÓDIGO 👆
 
-    // ... (Aquí continúa el resto de tu código original de las esferas)
+  
 
     // 1. Agitar esferas con potencia real (Velocidad directa + Giro)
     const shakeInterval = setInterval(() => {
